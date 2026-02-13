@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Lexend+Exa:wght@900&family=Montserrat:wght@900&family=Bangers&family=Playfair+Display:ital,wght@900&display=swap" rel="stylesheet">
+<style>
+  :root { 
+    --primary: #2ecc71; 
+    --bg: #f4f7f6; 
+    --panel: #ffffff; 
+    --text-dark: #1a1a1a;
+  }
+  
+  body { 
+    margin: 0; background: var(--bg); color: var(--text-dark); 
+    font-family: 'Montserrat', sans-serif; display: flex; height: 100vh; overflow: hidden;
+  }
+
+  /* Sidebar */
+  .editor-side {
+    width: 320px; background: var(--panel); border-right: 2px solid var(--primary);
+    display: flex; flex-direction: column; padding: 25px; gap: 20px; z-index: 10;
+    box-shadow: 10px 0 20px rgba(0,0,0,0.05);
+  }
+
+  .logo { font-size: 26px; font-weight: 900; color: var(--primary); letter-spacing: -1.5px; margin-bottom: 10px;}
+  .logo span { color: var(--text-dark); }
+
+  textarea {
+    width: 90%; height: 140px; background: #fdfdfd; color: #333; 
+    border: 2px solid #eee; border-radius: 12px; padding: 12px; font-size: 14px;
+    outline: none; transition: border 0.3s; resize: none;
+  }
+  textarea:focus { border-color: var(--primary); }
+
+  .btn {
+    padding: 16px; border: none; border-radius: 12px; font-weight: 900;
+    text-transform: uppercase; cursor: pointer; transition: 0.2s; font-size: 13px;
+  }
+  
+  #actionBtn { background: var(--primary); color: white; width: 100%; margin-top: 5px;}
+  #genBtn { background: #e0e0e0; color: #333; width: 100%; }
+
+  /* Preview Side */
+  .preview-side { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #fff; padding: 20px;}
+
+  .canvas-16-9 {
+    width: 100%; max-width: 750px; aspect-ratio: 16/9; 
+    background: #fff; border-radius: 20px; position: relative;
+    display: flex; align-items: center; justify-content: center;
+    border: 3px solid #f0f0f0; overflow: hidden;
+    box-shadow: 0 15px 45px rgba(0,0,0,0.05);
+  }
+
+  /* Text Output with Padding Safety */
+  #wordOutput { 
+    font-weight: 900; 
+    text-align: center; 
+    text-transform: uppercase; 
+    pointer-events: none;
+    max-width: 90%; /* Safety margin */
+    word-wrap: break-word;
+    display: block;
+    line-height: 1;
+  }
+
+  /* Animations */
+  .pop { animation: popAnim 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+  @keyframes popAnim { 0% { transform: scale(0.6); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+
+  .slide { animation: slideAnim 0.15s ease-out; }
+  @keyframes slideAnim { 0% { transform: translateY(30px); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
+</style>
+</head>
+<body>
+
+  <div class="editor-side">
+    <div class="logo">Typo<span>Craft</span></div>
+    
+    <div style="display:flex; flex-direction:column; gap:5px;">
+        <label style="font-size: 10px; font-weight: bold; color: #aaa;">SCRIPT EDITOR</label>
+        <textarea id="scriptInput">TYPOCRAFT AI IS NOW PERFECT. NO TEXT OVERFLOW. DYNAMIC SIZING IS LIVE!</textarea>
+    </div>
+
+    <button id="genBtn" class="btn" onclick="initTypoCraft()">Generate</button>
+    <button id="actionBtn" class="btn" onclick="handleAction()">Pause</button>
+  </div>
+
+  <div class="preview-side">
+    <div class="canvas-16-9" id="canvas">
+      <div id="wordOutput">READY</div>
+    </div>
+  </div>
+
+  <script>
+    let scriptData = [];
+    let currentIndex = 0;
+    let timer = null;
+    let isPlaying = false;
+    let isFinished = false;
+
+    const display = document.getElementById('wordOutput');
+    const canvas = document.getElementById('canvas');
+    const actionBtn = document.getElementById('actionBtn');
+    const genBtn = document.getElementById('genBtn');
+
+    const fonts = ["'Archivo Black'", "'Bangers'", "'Lexend Exa'", "'Playfair Display'", "'Montserrat'"];
+    const bgColors = ["#ffffff", "#f6fff8", "#f0f4ff", "#fffaf0", "#fdf2f2"];
+    const textColors = ["#1a1a1a", "#2ecc71", "#e74c3c", "#3498db", "#000000"];
+
+    function initTypoCraft() {
+      const text = document.getElementById('scriptInput').value;
+      const rawWords = text.split(/\s+/).filter(w => w.length > 0);
+      
+      scriptData = rawWords.map(word => {
+        // AI Size Logic: Lambe words ke liye chota base size
+        let baseSize = word.length > 8 ? 2.5 : 3.5;
+        let randomBoost = Math.random() * 1.5;
+        
+        return {
+          text: word,
+          font: fonts[Math.floor(Math.random() * fonts.length)],
+          color: textColors[Math.floor(Math.random() * textColors.length)],
+          bg: bgColors[Math.floor(Math.random() * bgColors.length)],
+          size: (baseSize + randomBoost).toFixed(1) + "rem"
+        };
+      });
+
+      currentIndex = 0;
+      isFinished = false;
+      stopEngine();
+      genBtn.innerText = "Regenerate";
+      startEngine(); 
+    }
+
+    function renderFrame() {
+      if (currentIndex < scriptData.length) {
+        isPlaying = true;
+        isFinished = false;
+        actionBtn.innerText = "Pause";
+        
+        const data = scriptData[currentIndex];
+        display.innerText = data.text;
+        display.style.fontFamily = data.font;
+        display.style.color = data.color;
+        display.style.fontSize = data.size;
+        canvas.style.backgroundColor = data.bg;
+
+        // Alternating animations
+        display.className = (currentIndex % 2 === 0) ? "pop" : "slide"; 
+        void display.offsetWidth;
+
+        currentIndex++;
+        timer = setTimeout(renderFrame, 550);
+      } else {
+        isPlaying = false;
+        isFinished = true;
+        actionBtn.innerText = "Re-watch";
+      }
+    }
+
+    function handleAction() {
+      if (isFinished) {
+        currentIndex = 0;
+        startEngine();
+      } else if (isPlaying) {
+        stopEngine();
+        actionBtn.innerText = "Resume";
+      } else {
+        startEngine();
+      }
+    }
+
+    function startEngine() {
+      if(scriptData.length === 0) return initTypoCraft();
+      renderFrame();
+    }
+
+    function stopEngine() {
+      isPlaying = false;
+      clearTimeout(timer);
+    }
+
+    window.onload = () => {
+        actionBtn.innerText = "Start";
+    };
+  </script>
+</body>
+</html>
