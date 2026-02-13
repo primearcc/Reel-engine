@@ -1,183 +1,187 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Pro Kinetic Reel Engine - Solid Style</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Montserrat:wght@900&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Lexend+Exa:wght@900&family=Montserrat:wght@900&family=Bangers&family=Playfair+Display:ital,wght@900&display=swap" rel="stylesheet">
 <style>
-body {
-    margin: 0;
-    background: #e0e0e0;
-    font-family: 'Archivo Black', sans-serif;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding-top: 20px;
-}
+  :root { 
+    --primary: #2ecc71; 
+    --bg: #f4f7f6; 
+    --panel: #ffffff; 
+    --text-dark: #1a1a1a;
+  }
+  
+  body { 
+    margin: 0; background: var(--bg); color: var(--text-dark); 
+    font-family: 'Montserrat', sans-serif; display: flex; height: 100vh; overflow: hidden;
+  }
 
-#screen {
-    width: 800px;
-    aspect-ratio: 16/9;
-    background: #ffffff; /* Initial Light Background */
-    border-radius: 20px;
-    position: relative;
-    overflow: hidden;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background 0.1s ease-in-out;
-}
+  /* Sidebar */
+  .editor-side {
+    width: 320px; background: var(--panel); border-right: 2px solid var(--primary);
+    display: flex; flex-direction: column; padding: 25px; gap: 20px; z-index: 10;
+    box-shadow: 10px 0 20px rgba(0,0,0,0.05);
+  }
 
-.word {
-    position: absolute;
-    font-weight: 900;
-    text-transform: uppercase;
-    color: #000; /* Dark text on light background */
-    text-align: center;
-    white-space: nowrap;
-    z-index: 10;
-    padding: 0 20px;
-}
+  .logo { font-size: 26px; font-weight: 900; color: var(--primary); letter-spacing: -1.5px; margin-bottom: 10px;}
+  .logo span { color: var(--text-dark); }
 
-textarea {
-    width: 780px;
-    height: 60px;
-    margin-top: 15px;
-    border: 2px solid #333;
-    border-radius: 12px;
-    padding: 10px;
-    font-size: 16px;
-    outline: none;
-}
+  textarea {
+    width: 90%; height: 140px; background: #fdfdfd; color: #333; 
+    border: 2px solid #eee; border-radius: 12px; padding: 12px; font-size: 14px;
+    outline: none; transition: border 0.3s; resize: none;
+  }
+  textarea:focus { border-color: var(--primary); }
 
-.controls {
-    margin-top: 10px;
-    display: flex;
-    gap: 10px;
-}
+  .btn {
+    padding: 166px; border: none; border-radius: 12px; font-weight: 900;
+    text-transform: uppercase; cursor: pointer; transition: 0.2s; font-size: 13px;
+    padding: 16px;
+  }
+  
+  #actionBtn { background: var(--primary); color: white; width: 100%; margin-top: 5px;}
+  #genBtn { background: #e0e0e0; color: #333; width: 100%; }
 
-button {
-    padding: 12px 30px;
-    border: none;
-    border-radius: 8px;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-    background: #000;
-    color: white;
-}
+  /* Preview Side */
+  .preview-side { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #fff; padding: 20px;}
 
-#ctrlBtn { background: #555; }
+  .canvas-16-9 {
+    width: 100%; max-width: 750px; aspect-ratio: 16/9; 
+    background: #fff; border-radius: 20px; position: relative;
+    display: flex; align-items: center; justify-content: center;
+    border: 3px solid #f0f0f0; overflow: hidden;
+    box-shadow: 0 15px 45px rgba(0,0,0,0.05);
+  }
+
+  /* Text Output */
+  #wordOutput { 
+    font-weight: 900; 
+    text-align: center; 
+    text-transform: uppercase; 
+    pointer-events: none;
+    max-width: 90%; 
+    word-wrap: break-word;
+    display: block;
+    line-height: 1;
+  }
+
+  /* Animations */
+  .pop { animation: popAnim 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+  @keyframes popAnim { 0% { transform: scale(0.6); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+
+  .slide { animation: slideAnim 0.15s ease-out; }
+  @keyframes slideAnim { 0% { transform: translateY(30px); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
 </style>
 </head>
 <body>
 
-<div id="screen"></div>
+  <div class="editor-side">
+    <div class="logo">Typo<span>Craft</span></div>
+    
+    <div style="display:flex; flex-direction:column; gap:5px;">
+        <label style="font-size: 10px; font-weight: bold; color: #aaa;">SCRIPT EDITOR</label>
+        <textarea id="scriptInput">TYPOCRAFT AI IS NOW PERFECT. NO TEXT OVERFLOW. DYNAMIC SIZING IS LIVE!</textarea>
+    </div>
 
-<textarea id="scriptBox">THIS IS HOW YOU CREATE IMPACT WITH DYNAMIC TEXT SCALING</textarea>
+    <button id="genBtn" class="btn" onclick="initTypoCraft()">Generate</button>
+    <button id="actionBtn" class="btn" onclick="handleAction()">Pause</button>
+  </div>
 
-<div class="controls">
-    <button id="genBtn">Generate</button>
-    <button id="ctrlBtn">Pause</button>
-</div>
+  <div class="preview-side">
+    <div class="canvas-16-9" id="canvas">
+      <div id="wordOutput">READY</div>
+    </div>
+  </div>
 
-<script>
-let words = [];
-let index = 0;
-let timer = null;
-let running = false;
-const screen = document.getElementById("screen");
+  <script>
+    let scriptData = [];
+    let currentIndex = 0;
+    let timer = null;
+    let isPlaying = false;
+    let isFinished = false;
 
-// Solid Light Colors like the reel
-const bgColors = ["#f8f9fa", "#e3f2fd", "#fff3e0", "#f1f8e9", "#fce4ec", "#fffde7"];
+    const display = document.getElementById('wordOutput');
+    const canvas = document.getElementById('canvas');
+    const actionBtn = document.getElementById('actionBtn');
+    const genBtn = document.getElementById('genBtn');
 
-function triggerWord() {
-    if (index >= words.length) {
-        clearInterval(timer);
-        running = false;
-        document.getElementById("ctrlBtn").innerText = "Re-Watch";
-        return;
+    const fonts = ["'Archivo Black'", "'Bangers'", "'Lexend Exa'", "'Playfair Display'", "'Montserrat'"];
+    const bgColors = ["#ffffff", "#f6fff8", "#f0f4ff", "#fffaf0", "#fdf2f2"];
+    const textColors = ["#1a1a1a", "#2ecc71", "#e74c3c", "#3498db", "#000000"];
+
+    function initTypoCraft() {
+      const text = document.getElementById('scriptInput').value;
+      const rawWords = text.split(/\s+/).filter(w => w.length > 0);
+      
+      scriptData = rawWords.map(word => {
+        let baseSize = word.length > 8 ? 2.5 : 3.5;
+        let randomBoost = Math.random() * 1.5;
+        
+        return {
+          text: word,
+          font: fonts[Math.floor(Math.random() * fonts.length)],
+          color: textColors[Math.floor(Math.random() * textColors.length)],
+          bg: bgColors[Math.floor(Math.random() * bgColors.length)],
+          size: (baseSize + randomBoost).toFixed(1) + "rem"
+        };
+      });
+
+      currentIndex = 0;
+      isFinished = false;
+      stopEngine();
+      genBtn.innerText = "Regenerate";
+      startEngine(); 
     }
 
-    // 1. Random Solid Light Background
-    screen.style.background = bgColors[Math.floor(Math.random() * bgColors.length)];
+    function renderFrame() {
+      if (currentIndex < scriptData.length) {
+        isPlaying = true;
+        isFinished = false;
+        actionBtn.innerText = "Pause";
+        
+        const data = scriptData[currentIndex];
+        display.innerText = data.text;
+        display.style.fontFamily = data.font;
+        display.style.color = data.color;
+        display.style.fontSize = data.size;
+        canvas.style.backgroundColor = data.bg;
 
-    // 2. Clear previous
-    screen.innerHTML = "";
+        display.className = (currentIndex % 2 === 0) ? "pop" : "slide"; 
+        void display.offsetWidth;
 
-    // 3. Create Word
-    const el = document.createElement("div");
-    el.className = "word";
-    el.innerText = words[index];
-    
-    // 4. SMART SCALING (As per link: short word = massive, long word = small)
-    const length = words[index].length;
-    let baseSize;
-    
-    if (length <= 3) baseSize = 250;      // Massive for short words like "GO", "YOU"
-    else if (length <= 6) baseSize = 160; // Big
-    else if (length <= 10) baseSize = 100;// Medium
-    else baseSize = 70;                   // Small for very long words
-
-    // Alternatively vary size to avoid boring pattern
-    const finalSize = index % 2 === 0 ? baseSize : baseSize * 0.6;
-    el.style.fontSize = finalSize + "px";
-
-    screen.appendChild(el);
-
-    // 5. ANIMATION (Impactful Pop)
-    const tl = gsap.timeline();
-    
-    // Quick Screen Shake for Impact
-    gsap.fromTo("#screen", {x: -4, y: -4}, {duration: 0.05, x: 4, y: 4, repeat: 1, yoyo: true});
-
-    tl.fromTo(el, 
-        { scale: 0.5, opacity: 0, rotation: Math.random() * 6 - 3 },
-        { 
-            duration: 0.15, 
-            scale: 1, 
-            opacity: 1, 
-            rotation: 0, 
-            ease: "back.out(2)" 
-        }
-    );
-
-    // Kinetic zoom-out effect while it stays
-    gsap.to(el, { scale: 0.95, duration: 0.6, ease: "power1.inOut" });
-
-    index++;
-}
-
-document.getElementById("genBtn").onclick = function() {
-    clearInterval(timer);
-    index = 0;
-    words = document.getElementById("scriptBox").value.trim().split(/\s+/);
-    if (words.length === 0) return;
-    running = true;
-    this.innerText = "Regenerate";
-    document.getElementById("ctrlBtn").innerText = "Pause";
-    timer = setInterval(triggerWord, 600); // Optimized timing
-    triggerWord();
-};
-
-document.getElementById("ctrlBtn").onclick = function() {
-    if (this.innerText === "Re-Watch") {
-        document.getElementById("genBtn").click();
-    } else if (running) {
-        clearInterval(timer);
-        running = false;
-        this.innerText = "Resume";
-    } else {
-        running = true;
-        this.innerText = "Pause";
-        timer = setInterval(triggerWord, 600);
+        currentIndex++;
+        timer = setTimeout(renderFrame, 550);
+      } else {
+        isPlaying = false;
+        isFinished = true;
+        actionBtn.innerText = "Re-watch";
+      }
     }
-};
-</script>
 
+    function handleAction() {
+      if (isFinished) {
+        currentIndex = 0;
+        startEngine();
+      } else if (isPlaying) {
+        stopEngine();
+        actionBtn.innerText = "Resume";
+      } else {
+        startEngine();
+      }
+    }
+
+    function startEngine() {
+      if(scriptData.length === 0) return initTypoCraft();
+      renderFrame();
+    }
+
+    function stopEngine() {
+      isPlaying = false;
+      clearTimeout(timer);
+    }
+
+    window.onload = () => {
+        actionBtn.innerText = "Start";
+    };
+  </script>
 </body>
 </html>
