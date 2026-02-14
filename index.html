@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Typocraft v20 | Smart Validation</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@800&family=Unbounded:wght@900&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root { --brand: #2ecc71; --dark: #111; }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family: 'Space Grotesk', sans-serif; background: #fff; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+
+        header { padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; }
+        .logo { color: var(--brand); font-weight: 800; font-size: 18px; }
+
+        main { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px; background: #fcfcfc; }
+
+        #videoBox {
+            background: #fff; border-radius: 20px; position: relative;
+            overflow: hidden; display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.05); border: 2px solid #eee;
+            transition: all 0.4s ease; width: 100%; aspect-ratio: 16/9;
+        }
+        #videoBox.vertical { aspect-ratio: 9/16; width: 280px; }
+
+        .word { display: inline-block; font-weight: 900; text-transform: uppercase; will-change: transform, opacity; }
+        .anim-in { animation: slam 0.4s forwards; }
+        .anim-out { animation: pop 0.3s forwards; }
+
+        @keyframes slam { 0% { opacity:0; transform: scale(1.6); filter: blur(5px); } 100% { opacity:1; transform: scale(1); filter: blur(0); } }
+        @keyframes pop { 100% { opacity:0; transform: scale(0.8); } }
+
+        .ui { width: 100%; max-width: 600px; padding: 15px; background: #fff; border-top: 1px solid #eee; }
+        .toolbar { display: flex; gap: 5px; margin-bottom: 10px; overflow-x: auto; padding-bottom: 5px; }
+        .t-btn { padding: 6px 12px; border-radius: 6px; border: 1px solid #ddd; background: #fff; font-size: 11px; font-weight: 700; cursor: pointer; white-space: nowrap; }
+        
+        textarea { width: 100%; height: 60px; background: #f5f5f5; border: none; padding: 10px; border-radius: 10px; font-size: 13px; outline: none; resize: none; margin-bottom: 10px; }
+        .main-btns { display: flex; gap: 8px; }
+        .btn { flex: 1; padding: 12px; border-radius: 10px; border: none; font-weight: 700; cursor: pointer; color: white; transition: 0.3s; }
+        .bg-green { background: var(--brand); }
+        .bg-black { background: var(--dark); }
+        .btn:active { transform: scale(0.95); }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">TYPOCRAFT v20</div>
+        <button class="t-btn" onclick="toggleRatio()">H / V Toggle</button>
+    </header>
+
+    <main>
+        <div id="videoBox"><div id="display"></div></div>
+        
+        <div class="toolbar">
+            <button class="t-btn" id="playPauseBtn" onclick="togglePlayPause()">Pause ⏸️</button>
+            <button class="t-btn" onclick="reWatch()">Re-watch ↺</button>
+            <button class="t-btn" style="border-color:var(--brand)" onclick="autoEnhance()">AI Auto-Enhance ✨</button>
+            <button class="t-btn" style="color:red" onclick="clearAll()">Clear</button>
+        </div>
+
+        <div class="ui">
+            <textarea id="magicInput" placeholder="Enter text here..."></textarea>
+            <div class="main-btns">
+                <button class="btn bg-green" onclick="runEngine()">Run Engine ⚡</button>
+                <button class="btn bg-black" id="dlBtn" onclick="startDownload()">Download 📥</button>
+            </div>
+        </div>
+    </main>
+
+<script>
+    let isPaused = false;
+    let stopSignal = false;
+    let currentLineIndex = 0;
+    const fonts = ['Syne', 'Unbounded', 'Space Grotesk'];
+    const bgs = ['#f0fff4', '#ffffff', '#f9f9f9', '#f0f7ff'];
+
+    // --- Validation Helper ---
+    function isInputEmpty() {
+        const val = document.getElementById('magicInput').value.trim();
+        if(!val) {
+            alert("Bhai phele kuch likh to lo!");
+            return true;
+        }
+        return false;
+    }
+
+    function toggleRatio() { document.getElementById('videoBox').classList.toggle('vertical'); }
+
+    function clearAll() {
+        document.getElementById('magicInput').value = '';
+        stopSignal = true;
+        document.getElementById('display').innerHTML = '';
+        currentLineIndex = 0;
+    }
+
+    function togglePlayPause() {
+        if(isInputEmpty()) return; // Check if empty
+        isPaused = !isPaused;
+        document.getElementById('playPauseBtn').innerText = isPaused ? "Play ▶️" : "Pause ⏸️";
+    }
+
+    function autoEnhance() {
+        if(isInputEmpty()) return; // Check if empty
+        let val = document.getElementById('magicInput').value.trim();
+        if(val.includes(',')) return; 
+
+        let words = val.split(/\s+/);
+        let enhanced = words.map(w => {
+            let size = w.length > 6 ? 9 : 6;
+            let font = fonts[Math.floor(Math.random()*fonts.length)];
+            let bg = bgs[Math.floor(Math.random()*bgs.length)];
+            return `${w}, ${font}, #333, ${size}, ${bg}`;
+        }).join('\n');
+        document.getElementById('magicInput').value = enhanced;
+    }
+
+    async function reWatch() {
+        if(isInputEmpty()) return; // Check if empty
+        stopSignal = true;
+        currentLineIndex = 0;
+        isPaused = false;
+        document.getElementById('playPauseBtn').innerText = "Pause ⏸️";
+        setTimeout(() => { stopSignal = false; runEngine(); }, 300);
+    }
+
+    async function runEngine() {
+        if(isInputEmpty()) return; // Check if empty
+        const input = document.getElementById('magicInput').value;
+        const lines = input.split('\n').filter(l => l.trim() !== '');
+        const display = document.getElementById('display');
+        const stage = document.getElementById('videoBox');
+
+        stopSignal = false;
+
+        for (let i = currentLineIndex; i < lines.length; i++) {
+            if(stopSignal) break;
+            while(isPaused) { await new Promise(r => setTimeout(r, 100)); if(stopSignal) break; }
+            
+            currentLineIndex = i;
+            let parts = lines[i].split(',').map(x => x.trim());
+            if(parts.length < 5) continue;
+
+            display.innerHTML = `<span class="word anim-in" style="font-family:${parts[1]}; color:${parts[2]}; font-size:${parts[3]}vw;">${parts[0]}</span>`;
+            stage.style.background = parts[4];
+
+            await new Promise(r => setTimeout(r, 900));
+            if(display.firstChild && !stopSignal) display.firstChild.classList.add('anim-out');
+            await new Promise(r => setTimeout(r, 300));
+        }
+    }
+
+    async function startDownload() {
+        if(isInputEmpty()) return; // Check if empty
+        const stage = document.getElementById('videoBox');
+        let stream;
+        try {
+            stream = stage.captureStream(30);
+        } catch(e) {
+            alert("Please host on GitHub Pages or open in a full browser window.");
+            return;
+        }
+        
+        const recorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
+        const chunks = [];
+        recorder.ondataavailable = e => chunks.push(e.data);
+        recorder.onstop = () => {
+            const blob = new Blob(chunks, { type: 'video/webm' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'typocraft_video.webm';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        };
+        recorder.start();
+        await reWatch();
+        setTimeout(() => recorder.stop(), 1000);
+    }
+</script>
+</body>
+</html>
