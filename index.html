@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Typocraft - Reel Engine v2</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Bangers&family=Playfair+Display:ital@1&family=Inter:wght@900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2ecc71;
+            --bg: #0f172a;
+            --panel: #1e293b;
+            --text-light: #f8fafc;
+        }
+
+        body {
+            margin: 0;
+            background: var(--bg);
+            font-family: 'Montserrat', sans-serif;
+            color: var(--text-light);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Sidebar UI */
+        .editor-side {
+            width: 350px;
+            background: var(--panel);
+            padding: 20px;
+            border-right: 1px solid #334155;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .vibe-box {
+            background: #0f172a;
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid var(--primary);
+        }
+
+        .slot {
+            margin-bottom: 15px;
+        }
+
+        .slot label {
+            font-size: 12px;
+            color: var(--primary);
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        select, input[type="color"] {
+            background: #1e293b;
+            border: 1px solid #475569;
+            color: white;
+            padding: 8px;
+            border-radius: 6px;
+        }
+
+        select { flex: 1; }
+
+        /* Preview Area */
+        .preview-area {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            background: black;
+        }
+
+        .video-mockup {
+            width: 300px;
+            height: 533px; /* 9:16 Ratio */
+            border: 4px solid #334155;
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .kinetic-text {
+            text-align: center;
+            transition: all 0.5s ease;
+        }
+
+        button.generate-btn {
+            background: var(--primary);
+            color: #000;
+            font-weight: bold;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        button.generate-btn:hover { opacity: 0.9; }
+    </style>
+</head>
+<body>
+
+    <div class="editor-side">
+        <h2>Typocraft AI</h2>
+        <p style="font-size: 13px; color: #94a3b8;">Choose 3 fonts. Our AI will handle the kinetic animation.</p>
+
+        <div class="vibe-box">
+            <div class="slot">
+                <label>Slot 1: Intro Style</label>
+                <div class="controls">
+                    <select id="f1"><option value="Inter">Modern Bold</option><option value="Bangers">Loud Pop</option></select>
+                    <input type="color" id="c1" value="#ffffff">
+                </div>
+            </div>
+
+            <div class="slot">
+                <label>Slot 2: Highlight Style</label>
+                <div class="controls">
+                    <select id="f2"><option value="Playfair Display">Elegant Italic</option><option value="Montserrat">Clean Sans</option></select>
+                    <input type="color" id="c2" value="#2ecc71">
+                </div>
+            </div>
+
+            <div class="slot">
+                <label>Slot 3: Outro Style</label>
+                <div class="controls">
+                    <select id="f3"><option value="Bangers">Action Style</option><option value="Inter">Deep Impact</option></select>
+                    <input type="color" id="c3" value="#ff4757">
+                </div>
+            </div>
+        </div>
+
+        <button class="generate-btn" onclick="triggerAI()">Generate Reel Magic ✨</button>
+    </div>
+
+    <div class="preview-area">
+        <div class="video-mockup" id="previewContainer">
+            <div id="text1" class="kinetic-text">DYNAMIC</div>
+            <div id="text2" class="kinetic-text">KINETIC</div>
+            <div id="text3" class="kinetic-text">TYPOGRAPHY</div>
+        </div>
+    </div>
+
+    <script>
+        function triggerAI() {
+            // AI Logic simulation: Automatically applying fonts and colors
+            const slots = [
+                {f: document.getElementById('f1').value, c: document.getElementById('c1').value, el: 'text1'},
+                {f: document.getElementById('f2').value, c: document.getElementById('c2').value, el: 'text2'},
+                {f: document.getElementById('f3').value, c: document.getElementById('c3').value, el: 'text3'}
+            ];
+
+            slots.forEach(slot => {
+                const el = document.getElementById(slot.el);
+                el.style.fontFamily = slot.f;
+                el.style.color = slot.c;
+                // Auto-Animation Vibe
+                el.style.fontSize = "40px";
+                el.style.transform = "scale(1.1)";
+            });
+
+            alert("AI Kinetic Engine: Animations are being calculated for your fonts!");
+        }
+    </script>
+</body>
+</html>
