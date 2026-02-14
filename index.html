@@ -1,192 +1,47 @@
+
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Typocraft Studio v21</title>
-    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@800&family=Unbounded:wght@900&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
     <style>
-        :root { --brand: #2ecc71; --dark: #111; --soft-glow: rgba(46, 204, 113, 0.1); }
-        * { margin:0; padding:0; box-sizing:border-box; }
-        body { font-family: 'Space Grotesk', sans-serif; background: #fff; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
-
-        header { padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; background: white; z-index: 10; }
-        .logo { color: var(--brand); font-weight: 800; font-size: 18px; letter-spacing: -1px; }
-
-        main { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px; background: #fafafa; }
-
-        /* --- V21 CINEMATIC CANVAS --- */
-        #videoBox {
-            background: #fff; border-radius: 24px; position: relative;
-            overflow: hidden; display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.05);
-            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-            width: 100%; aspect-ratio: 16/9;
-        }
-        #videoBox.vertical { aspect-ratio: 9/16; width: 300px; }
-
-        /* Progress Bar on Top of Canvas */
-        #progress-container {
-            position: absolute; top: 0; left: 0; width: 100%; height: 5px; background: rgba(0,0,0,0.03);
-        }
-        #progress-bar {
-            height: 100%; width: 0%; background: var(--brand); transition: width 0.4s ease;
-        }
-
-        .word { display: inline-block; font-weight: 900; text-transform: uppercase; will-change: transform, opacity; z-index: 2; }
-        .anim-in { animation: cinematicIn 0.5s forwards cubic-bezier(0.23, 1, 0.32, 1); }
-        .anim-out { animation: cinematicOut 0.4s forwards cubic-bezier(0.4, 0, 1, 1); }
-
-        @keyframes cinematicIn { 
-            0% { opacity:0; transform: scale(1.4) translateY(20px); filter: blur(10px); } 
-            100% { opacity:1; transform: scale(1) translateY(0); filter: blur(0); } 
-        }
-        @keyframes cinematicOut { 
-            100% { opacity:0; transform: scale(0.9) translateY(-20px); filter: blur(5px); } 
-        }
-
-        /* UI Controls */
-        .ui { width: 100%; max-width: 600px; padding: 20px; background: #fff; border-top: 1px solid #eee; border-radius: 30px 30px 0 0; box-shadow: 0 -10px 30px rgba(0,0,0,0.02); }
-        .toolbar { display: flex; gap: 8px; margin-bottom: 12px; overflow-x: auto; padding-bottom: 5px; scrollbar-width: none; }
-        .t-btn { padding: 8px 16px; border-radius: 12px; border: 1px solid #eee; background: #fdfdfd; font-size: 12px; font-weight: 700; cursor: pointer; white-space: nowrap; transition: 0.2s; }
-        .t-btn:hover { border-color: var(--brand); background: #f0fff4; }
-        
-        textarea { width: 100%; height: 65px; background: #f8f9fa; border: 1px solid #eee; padding: 12px; border-radius: 16px; font-size: 14px; outline: none; resize: none; margin-bottom: 12px; font-family: inherit; }
-        .main-btns { display: flex; gap: 10px; }
-        .btn { flex: 1; padding: 16px; border-radius: 16px; border: none; font-weight: 700; cursor: pointer; color: white; font-size: 15px; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        .bg-green { background: var(--brand); box-shadow: 0 10px 20px rgba(46, 204, 113, 0.2); }
-        .bg-black { background: var(--dark); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
-        .btn:active { transform: scale(0.95); }
+        body { background: #000; color: white; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+        #display { font-size: 5rem; font-weight: 900; text-transform: uppercase; text-align: center; min-height: 200px; display: flex; align-items: center; }
+        .controls { margin-top: 20px; }
+        button { padding: 10px 20px; cursor: pointer; background: #00ff00; border: none; font-weight: bold; }
+        .neon { color: #00ff00; text-shadow: 0 0 20px #00ff00; scale: 1.2; transition: 0.2s; }
     </style>
 </head>
 <body>
 
-    <header>
-        <div class="logo">TYPOCRAFT PRO v21</div>
-        <button class="t-btn" onclick="toggleRatio()">Aspect Ratio 🔄</button>
-    </header>
+    <div id="display">READY?</div>
 
-    <main>
-        <div id="videoBox">
-            <div id="progress-container"><div id="progress-bar"></div></div>
-            <div id="display"></div>
-        </div>
-        
-        <div class="toolbar" style="margin-top: 15px;">
-            <button class="t-btn" id="playPauseBtn" onclick="togglePlayPause()">Pause ⏸️</button>
-            <button class="t-btn" onclick="reWatch()">Re-watch ↺</button>
-            <button class="t-btn" style="color:var(--brand)" onclick="autoEnhance()">AI Enhance ✨</button>
-            <button class="t-btn" style="color:#ff4757" onclick="clearAll()">Clear 🗑️</button>
-        </div>
+    <div class="controls">
+        <button onclick="startReel()">PLAY ANIMATION</button>
+    </div>
 
-        <div class="ui">
-            <textarea id="magicInput" placeholder="Write script or use AI Enhance..."></textarea>
-            <div class="main-btns">
-                <button class="btn bg-green" onclick="runEngine()">Run Engine ⚡</button>
-                <button class="btn bg-black" id="dlBtn" onclick="startDownload()">Download 📥</button>
-            </div>
-        </div>
-    </main>
+    <script>
+        const script = [
+            { text: "DON’T", time: 800 },
+            { text: "TELL PEOPLE", time: 800 },
+            { text: "YOUR PLANS.", time: 1000 },
+            { text: "", time: 500 }, // Pause
+            { text: "SHOW THEM", time: 600, style: "neon" },
+            { text: "YOUR", time: 400, style: "neon" },
+            { text: "RESULTS.", time: 1500, style: "neon" }
+        ];
 
-<script>
-    let isPaused = false;
-    let stopSignal = false;
-    let currentLineIndex = 0;
-    const fonts = ['Syne', 'Unbounded', 'Space Grotesk'];
-
-    function toggleRatio() { document.getElementById('videoBox').classList.toggle('vertical'); }
-
-    function clearAll() {
-        document.getElementById('magicInput').value = '';
-        stopSignal = true;
-        document.getElementById('display').innerHTML = '';
-        document.getElementById('progress-bar').style.width = '0%';
-        currentLineIndex = 0;
-    }
-
-    function togglePlayPause() {
-        if(!document.getElementById('magicInput').value.trim()) return alert("Bhai phele kuch likh to lo!");
-        isPaused = !isPaused;
-        document.getElementById('playPauseBtn').innerText = isPaused ? "Play ▶️" : "Pause ⏸️";
-    }
-
-    function autoEnhance() {
-        let val = document.getElementById('magicInput').value.trim();
-        if(!val) return alert("Bhai phele kuch likh to lo!");
-        if(val.includes(',')) return; 
-
-        let words = val.split(/\s+/);
-        let enhanced = words.map(w => {
-            let size = w.length > 7 ? 8 : 11;
-            let font = fonts[Math.floor(Math.random()*fonts.length)];
-            let bg = '#ffffff'; // Keep it clean
-            return `${w}, ${font}, #111, ${size}, ${bg}`;
-        }).join('\n');
-        document.getElementById('magicInput').value = enhanced;
-    }
-
-    async function reWatch() {
-        if(!document.getElementById('magicInput').value.trim()) return alert("Bhai phele kuch likh to lo!");
-        stopSignal = true;
-        currentLineIndex = 0;
-        isPaused = false;
-        document.getElementById('playPauseBtn').innerText = "Pause ⏸️";
-        setTimeout(() => { stopSignal = false; runEngine(); }, 300);
-    }
-
-    async function runEngine() {
-        const input = document.getElementById('magicInput').value;
-        if(!input.trim()) return alert("Bhai phele kuch likh to lo!");
-        
-        const lines = input.split('\n').filter(l => l.trim() !== '');
-        const display = document.getElementById('display');
-        const stage = document.getElementById('videoBox');
-        const pBar = document.getElementById('progress-bar');
-
-        stopSignal = false;
-
-        for (let i = currentLineIndex; i < lines.length; i++) {
-            if(stopSignal) break;
-            while(isPaused) { await new Promise(r => setTimeout(r, 100)); if(stopSignal) break; }
-            
-            currentLineIndex = i;
-            let parts = lines[i].split(',').map(x => x.trim());
-            if(parts.length < 5) continue;
-
-            // Update Progress
-            pBar.style.width = ((i + 1) / lines.length * 100) + "%";
-
-            // Apply Glow Background
-            stage.style.background = `radial-gradient(circle at center, ${parts[2]}08 0%, ${parts[4]} 100%)`;
-            
-            display.innerHTML = `<span class="word anim-in" style="font-family:${parts[1]}; color:${parts[2]}; font-size:${parts[3]}vw;">${parts[0]}</span>`;
-
-            await new Promise(r => setTimeout(r, 900));
-            if(display.firstChild && !stopSignal) display.firstChild.classList.add('anim-out');
-            await new Promise(r => setTimeout(r, 300));
+        async function startReel() {
+            const display = document.getElementById('display');
+            for (let line of script) {
+                display.innerText = line.text;
+                if (line.style) display.classList.add(line.style);
+                else display.classList.remove('neon');
+                
+                await new Promise(r => setTimeout(r, line.time));
+            }
+            display.innerText = "DONE.";
+            display.classList.remove('neon');
         }
-    }
-
-    async function startDownload() {
-        if(!document.getElementById('magicInput').value.trim()) return alert("Bhai phele kuch likh to lo!");
-        const stage = document.getElementById('videoBox');
-        let stream;
-        try { stream = stage.captureStream(60); } catch(e) { return alert("Please open in full browser."); }
-        
-        const recorder = new MediaRecorder(stream, { mimeType: 'video/webm;codecs=vp9' });
-        const chunks = [];
-        recorder.ondataavailable = e => chunks.push(e.data);
-        recorder.onstop = () => {
-            const blob = new Blob(chunks, { type: 'video/webm' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = 'typocraft_reel.webm';
-            link.click();
-        };
-        recorder.start();
-        await reWatch();
-        setTimeout(() => recorder.stop(), 500);
-    }
-</script>
+    </script>
 </body>
 </html>
